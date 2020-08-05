@@ -25,7 +25,7 @@ SECRET_KEY = 'ph=*9=e@ncy_6&_j8q_7()_=@0xyt(_cvw#s=m4)v4p84@#_px'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.1.16"]
 
 
 # Application definition
@@ -75,10 +75,10 @@ WSGI_APPLICATION = 'ansibleSite.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
 }
 
 
@@ -119,3 +119,59 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#LOGGING_DIR 日志文件存放目录
+LOGGING_DIR = os.path.join(BASE_DIR, "log")   # 日志存放路径
+if not os.path.exists(LOGGING_DIR):
+    os.mkdir(LOGGING_DIR)
+
+import logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {  #格式化器
+        'standard': {
+            'format': '[%(levelname)s][%(asctime)s][%(filename)s][%(funcName)s][%(lineno)d] > %(message)s'
+        },
+        'simple': {
+            'format': '[%(levelname)s]> %(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file_handler': {
+             'level': 'INFO',
+             'class': 'logging.handlers.TimedRotatingFileHandler',
+             'filename': '%s/django.log' % LOGGING_DIR,  #具体日志文件的名字
+             'formatter':'standard'
+        }, # 用于文件输出
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+             'formatter':'standard'
+        },
+    },
+    'loggers': {   #日志分配到哪个handlers中
+        'mydjango': {
+            'handlers': ['console','file_handler'],
+            'level':'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },####如果要将get,post请求同样写入到日志文件中，则这个触发器的名字必须交django,然后写到handler中
+    }
+}

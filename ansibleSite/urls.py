@@ -20,5 +20,9 @@ from shell import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^hello/$', views.hello)
+    url(r'^hello/$', views.hello),
+    url(r'^deploy_front/$', views.deploy_front),
+    url(r'^deploy_baseserver/$', views.deploy_baseserver),
+    url(r'^deploy_qamanage/$', views.deploy_qamanage),
+    url(r'^deploy_socialsecurity/$', views.deploy_socialsecurity)
 ]
